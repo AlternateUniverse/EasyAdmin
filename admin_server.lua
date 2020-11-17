@@ -16,7 +16,7 @@ Citizen.CreateThread(function()
 	while true do 
 		Wait(20000)
 		for i, player in pairs(CachedPlayers) do 
-			if player.droppedTime and (os.time() > player.droppedTime+600) then
+			if player.droppedTime and (os.time() > player.droppedTime+98400) then
 				CachedPlayers[i]=nil
 			end
 		end
@@ -189,7 +189,6 @@ RegisterCommand("ea_excludeWebhookFeature", function(source, args, rawCommand)
     end
 end, false)
 
-AnonymousAdmins = {}
 Citizen.CreateThread(function()
 	local strfile = LoadResourceFile(GetCurrentResourceName(), "language/"..GetConvar("ea_LanguageName", "en")..".json")
 	if strfile then
@@ -202,7 +201,6 @@ Citizen.CreateThread(function()
 	moderationNotification = GetConvar("ea_moderationNotification", "false")
 	if GetConvar("ea_enableDebugging", "false") == "true" then
 		enableDebugging = true
-		PrintDebugMessage("^1Debug Messages Enabled, Anonymous Admins may not be anonymous!")
 	else
 		enableDebugging = false
 	end
@@ -664,20 +662,6 @@ Citizen.CreateThread(function()
 		end
 	end)
 
-	RegisterServerEvent("EasyAdmin:SetAnonymous")
-	AddEventHandler('EasyAdmin:SetAnonymous', function(playerId)
-		if DoesPlayerHavePermission(source,"easyadmin.anon") then
-			if AnonymousAdmins[source] then
-				AnonymousAdmins[source] = nil
-				PrintDebugMessage("Player "..getName(source,true).." un-anoned himself")
-			else
-				AnonymousAdmins[source] = true
-				PrintDebugMessage("Player "..getName(source,true).." anoned himself")
-			end
-		end
-	end)
-
-	
 	blacklist = {}
 	
 
@@ -741,19 +725,15 @@ Citizen.CreateThread(function()
 	--[[
 		Very basic function that turns "source" into a useable player name.
 	]]
-	function getName(src,anonymousdisabled)
+	function getName(src)
 		if (src == 0 or src == "") then
 			return "Console"
+		elseif CachedPlayers[src] and CachedPlayers[src].name then
+			return CachedPlayers[src].name
+		elseif (GetPlayerName(src)) then
+			return GetPlayerName(src)
 		else
-			if AnonymousAdmins[src] and not anonymousdisabled then
-				return GetLocalisedText("anonymous")
-			elseif CachedPlayers[src] and CachedPlayers[src].name then
-				return CachedPlayers[src].name
-			elseif (GetPlayerName(src)) then
-				return GetPlayerName(src)
-			else
-				return "Unknown - " .. src
-			end
+			return "Unknown - " .. src
 		end
 	end
 	

@@ -9,7 +9,6 @@ permissions = {
 	["freeze"] = false,
 	["screenshot"] = false,
 	["immune"] = false,
-	["anon"] = false,
 	["mute"] = false,
 	["teleport.everyone"] = false,
 }
